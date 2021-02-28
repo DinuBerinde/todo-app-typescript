@@ -10,7 +10,7 @@ A todo front-end app written in typescript.
 
 ## Usage
 
-###Install dependencies
+### Install dependencies
 `npm run i`
 
 ### Run app with live reload of typescript code
