@@ -26,7 +26,6 @@ export class ListTodoComponent extends AbstractComponent {
     }
 
     private buildTodoComponent(data: Todo): TodoComponent {
-        console.log(data)
         return new TodoComponent({
             parentEl: this.rootEl,
             id: data.id,

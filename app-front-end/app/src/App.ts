@@ -52,8 +52,14 @@ class App extends AbstractComponent {
             onUpdateTodoItem: (todo, id) => this.onUpdateTodoItem(todo, id),
         });
 
+        const titleTodos = HtmlUtils.buildElement({
+           name: 'h5',
+           text: 'TODOS'
+        });
+
         this.rootEl.appendChild(divTitle)
         this.rootEl.appendChild(addTodoComponent.getEl());
+        this.rootEl.appendChild(titleTodos);
         this.rootEl.appendChild(this.listTodoComponent.getEl());
 
         this.getTodoItems();

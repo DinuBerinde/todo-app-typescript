@@ -2,8 +2,7 @@
 A todo app written in typescript (front-end and back-end)
 
 ### Tools used front-end
-* Node 
-* npm  
+* Node
 * Typescript as programming language
 * Webpack as a module bundler and dev server 
 * Axios for http requests  
@@ -11,8 +10,8 @@ A todo app written in typescript (front-end and back-end)
 
 ### Tools used backend-end
 * Node
-* express
 * Typescript as programming language
+* Nodemon as dev server and live reload
 
 ## Usage front-end
 from root folder run the following cmd  
