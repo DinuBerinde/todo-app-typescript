@@ -25,12 +25,11 @@ const data: Array<TodoItem> = [
  */
 export class TodoController {
 
-    public getTodos(req: Request, res: Response) {
+    public async getTodos(req: Request, res: Response) {
         res.json(data);
     }
 
-    public postTodo(req: Request, res: Response) {
-        console.log(req.body)
+    public async postTodo(req: Request, res: Response) {
         const todoItem = req.body;
         todoItem.id = generateID();
         data.push(todoItem);
@@ -38,7 +37,7 @@ export class TodoController {
         res.json(todoItem);
     }
 
-    public patchTodo(req: Request, res: Response) {
+    public async patchTodo(req: Request, res: Response) {
         const todoItem = req.body as TodoItem;
         data.forEach(dataItem => {
             if (dataItem.id === todoItem.id) {
@@ -49,7 +48,7 @@ export class TodoController {
         res.status(200).end()
     }
 
-    public deleteTodo(req: Request, res: Response) {
+    public async deleteTodo(req: Request, res: Response) {
         const id = req.params.id;
         data.forEach((dataItem, index) => {
             if (dataItem.id === id) {

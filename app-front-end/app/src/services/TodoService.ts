@@ -6,6 +6,9 @@ import {Todo} from "../App";
  */
 export class TodoService {
 
+    /**
+     * It returns all TodoItems.
+     */
     public async get(): Promise<Array<Todo>> {
         try {
             const response = await axios.get('http://localhost:3000/todos');
@@ -13,10 +16,14 @@ export class TodoService {
         } catch (e) {
             console.error(e)
             alert('Error fetching data')
-            return null
+            Promise.reject();
         }
     }
 
+    /**
+     * It add a new TodoItem.
+     * @param todoItem the todoItem
+     */
     public async post(todoItem: Todo): Promise<Todo> {
         try {
             const response = await axios.post(
@@ -27,10 +34,14 @@ export class TodoService {
         } catch (e) {
             console.error(e)
             alert('Error posting data')
-            return null
+            Promise.reject();
         }
     }
 
+    /**
+     * It updates a TodoItem.
+     * @param todoItem the todoItem to be updated
+     */
     public async patch(todoItem: Todo): Promise<Todo> {
         try {
             const response = await axios.patch(
@@ -41,10 +52,14 @@ export class TodoService {
         } catch (e) {
             console.error(e)
             alert('Error updating data')
-            return null
+            Promise.reject();
         }
     }
 
+    /**
+     * It removes a TodoItem.
+     * @param id the id of the TodoItem
+     */
     public async delete(id: string): Promise<Todo> {
         try {
             const response = await axios.delete("http://localhost:3000/todo/" + id);
@@ -52,7 +67,7 @@ export class TodoService {
         } catch (e) {
             console.error(e)
             alert('Error deleting data')
-            return null
+            Promise.reject();
         }
     }
 

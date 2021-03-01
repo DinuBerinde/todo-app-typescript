@@ -68,6 +68,11 @@ export class TodoComponent extends AbstractComponent {
             }
         });
         buttonConfirm.onclick = ev => {
+            if (!input.value) {
+                alert("No empty TODO item allowed");
+                return;
+            }
+            
             const newDescription = input.value
             this.properties.onUpdateTodoItem(this.properties.data, this.properties.id, newDescription)
 

@@ -53,10 +53,19 @@ export class ListTodoComponent extends AbstractComponent {
     }
 
     /**
-     * It remove a TodoItem.
+     * It removes a TodoItem.
      * @param id the id of the item
      */
     public removeTodoItem(id: string) {
         this.rootEl.children.namedItem(id).remove();
+    }
+
+    /**
+     * It removes all TodoItems.
+     */
+    public removeAll() {
+        while (this.rootEl.firstChild) {
+            this.rootEl.removeChild(this.rootEl.firstChild);
+        }
     }
 }

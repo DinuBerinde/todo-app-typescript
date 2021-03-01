@@ -1,5 +1,3 @@
-import {HtmlUtils} from "../utils/HtmlUtils";
-
 /**
  * Abstract component which appends a child HTML element to a parent HTML element
  * and it renders to child content.
@@ -12,11 +10,6 @@ export abstract class AbstractComponent {
         this.properties = properties;
         this.rootEl = this.buildRootElement(properties.id)
         properties.parentEl.appendChild(this.rootEl);
-
-        (async () => {
-            await this.onPreRender();
-            this.render();
-        })();
     }
 
     /**
@@ -30,14 +23,10 @@ export abstract class AbstractComponent {
     public abstract buildRootElement(id?: string): HTMLElement;
 
     /**
-     * Method used before rendering. Useful for fetching data.
-     */
-    public async onPreRender(): Promise<void> {};
-
-    /**
      * Yields the HTML element of this component.
      */
     public getEl(): HTMLElement {
+        this.render();
         return this.rootEl;
     }
 }

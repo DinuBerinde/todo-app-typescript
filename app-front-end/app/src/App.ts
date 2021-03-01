@@ -8,24 +8,24 @@ import {TodoService} from "./services/TodoService";
 const appEl = document.getElementById("app") as HTMLElement;
 appEl.classList.add("container")
 
-/**
- * The items data
- */
-const data: Array<Todo> = []
 
 /**
- * the crud service
+ * App component class.
  */
-const todoService = new TodoService();
-
 class App extends AbstractComponent {
     private listTodoComponent: ListTodoComponent;
 
-    public async onPreRender(): Promise<void> {
-        const items = await todoService.get();
-        data.push(...items)
-    }
+    /**
+     * the crud service
+     */
+    private readonly todoService = new TodoService();
 
+    /**
+     * The items data
+     */
+    private readonly data: Array<Todo> = [];
+
+    
     public render() {
 
         const divTitle = HtmlUtils.buildElement({
@@ -47,7 +47,7 @@ class App extends AbstractComponent {
         this.listTodoComponent = new ListTodoComponent({
             parentEl: this.rootEl,
             id: 'listTodo',
-            data: data,
+            data: this.data,
             onRemoveTodoItem: id => this.onRemoveTodoItem(id),
             onUpdateTodoItem: (todo, id, newDescription) => this.onUpdateTodoItem(todo, id, newDescription),
         });
@@ -55,6 +55,8 @@ class App extends AbstractComponent {
         this.rootEl.appendChild(divTitle)
         this.rootEl.appendChild(addTodoComponent.getEl());
         this.rootEl.appendChild(this.listTodoComponent.getEl());
+
+        this.getTodoItems();
     }
 
     public buildRootElement(id?: string): HTMLElement {
@@ -67,19 +69,35 @@ class App extends AbstractComponent {
         })
     }
 
+    /**
+     * It fetches the TodoItems.
+     */
+    public getTodoItems(): void {
+        (async () => {
+            const items = await this.todoService.get();
+            this.data.splice(0, this.data.length);
+            this.data.push(...items)
+
+            this.listTodoComponent.removeAll();
+            this.listTodoComponent.render();
+        })();
+    }
 
     /**
      * It add a new TodoItem.
      * @param itemTodo the description of the TodoItem
      */
     public onAddTodoItem(itemTodo: string) {
-        todoService.post({
-            id: '',
-            description: itemTodo
-        }).then(res => {
-            data.push(res)
-            this.listTodoComponent.addTodoItem(data[data.length - 1]);
-        })
+        (async () => {
+
+            const newTodoItem = await this.todoService.post({
+                id: '',
+                description: itemTodo
+            });
+
+            this.data.push(newTodoItem);
+            this.listTodoComponent.addTodoItem(this.data[this.data.length - 1]);
+        })();
     }
 
     /**
@@ -90,9 +108,11 @@ class App extends AbstractComponent {
      */
     public onUpdateTodoItem(todoItem: Todo, id: string, newDescription: string) {
         todoItem.description = newDescription;
-        todoService.patch(todoItem).then(res => {
+
+        (async () => {
+            await this.todoService.patch(todoItem);
             this.listTodoComponent.updateTodoItem(todoItem, id);
-        })
+        })();
     }
 
     /**
@@ -100,14 +120,10 @@ class App extends AbstractComponent {
      * @param id the id of the item
      */
     public onRemoveTodoItem(id: string) {
-        todoService.delete(id).then(res => {
-            data.forEach((dataItem, index) => {
-                if (dataItem.id === id) {
-                    data.splice(index, 1);
-                }
-            })
-            this.listTodoComponent.removeTodoItem(id);
-        })
+        (async () => {
+            await this.todoService.delete(id);
+            this.getTodoItems();
+        })();
     }
 }
 
@@ -121,4 +137,4 @@ export interface Todo {
 }
 
 // render app
-new App({parentEl: appEl});
+new App({parentEl: appEl}).getEl();

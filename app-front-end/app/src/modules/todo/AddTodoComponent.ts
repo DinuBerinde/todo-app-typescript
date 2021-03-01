@@ -24,6 +24,10 @@ export class AddTodoComponent extends AbstractComponent {
 
         const addButton = HtmlUtils.buildElementButton({name: 'button', type: 'button', classes: 'btn btn-primary', text: 'Add'})
         addButton.onclick = ev => {
+            if (!input.value) {
+                alert("No empty TODO item allowed");
+                return;
+            }
             this.properties.onAddTodoItem(input.value)
             input.value = ""
         }
