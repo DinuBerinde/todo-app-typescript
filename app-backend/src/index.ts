@@ -1,24 +1,47 @@
-import express from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-
+import * as http from "http";
+import {IncomingMessage, ServerResponse} from "http";
 import {TodoController} from "./TodoController";
 
 const todoController = new TodoController();
-const app = express();
-app.use(cors())
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
-app.route('/todos')
-    .get(todoController.getTodos)
-    .post(todoController.postTodo)
-    .patch(todoController.patchTodo);
+const server = http.createServer(async (request: IncomingMessage, response: ServerResponse) => {
 
-app.route('/todo/:id')
-    .delete(todoController.deleteTodo)
+    if (request.method === 'OPTIONS') {
+        response.writeHead(204, {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "OPTIONS, POST, GET, PATCH, DELETE",
+            'Access-Control-Allow-Headers': 'Content-Type, Accept'
+        });
+        response.end();
+        return;
+    }
 
-const port = process.env.PORT || 3000;
-app.listen(port);
+    if (request.url === '/todos') {
 
-console.log('Server started at port: ' + port);
+        if (request.method === 'GET') {
+            await todoController.getTodos(request, response)
+
+        } else if (request.method === 'POST') {
+            await todoController.postTodo(request, response)
+
+        } else if (request.method === 'PATCH') {
+            await todoController.patchTodo(request, response)
+
+        } else {
+            response.writeHead(404);
+            response.end();
+        }
+
+    } else if (request.method === 'DELETE' && request.url?.startsWith('/todo/')) {
+        await todoController.deleteTodo(request, response)
+
+    } else {
+        response.writeHead(404);
+        response.end();
+    }
+});
+
+const port = 3000;
+server.listen(port);
+
+console.log('Server started on port: ' + port);

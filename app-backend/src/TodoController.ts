@@ -1,4 +1,5 @@
-import {Request, Response} from "express";
+import {IncomingMessage, ServerResponse} from "http";
+
 
 /**
  * It generates a unique ID.
@@ -33,39 +34,108 @@ const data: Array<TodoItem> = [
  * Simple CRUD controller for the TodoItems.
  */
 export class TodoController {
+    private readonly headers = {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'OPTIONS, POST, GET, PATCH, DELETE',
+        'Access-Control-Allow-Headers': 'Content-Type, Accept'
+    };
 
-    public async getTodos(req: Request, res: Response) {
-        res.json(data);
-    }
-
-    public async postTodo(req: Request, res: Response) {
-        const todoItem = req.body;
-        todoItem.id = generateID();
-        data.push(todoItem);
-
-        res.json(todoItem);
-    }
-
-    public async patchTodo(req: Request, res: Response) {
-        const todoItem = req.body as TodoItem;
-        data.forEach(dataItem => {
-            if (dataItem.id === todoItem.id) {
-                dataItem.description = todoItem.description;
-            }
-        });
-
-        res.status(200).end()
-    }
-
-    public async deleteTodo(req: Request, res: Response) {
-        const id = req.params.id;
-        data.forEach((dataItem, index) => {
-            if (dataItem.id === id) {
-                data.splice(index, 1);
-            }
+    public async getTodos(req: IncomingMessage, res: ServerResponse) {
+        this.wrapExceptions(req, res, () => {
+            res.writeHead(200, this.headers);
+            res.end(JSON.stringify(data));
         })
+    }
 
-        res.status(200).end()
+    /**
+     * It adds a TodoItem the the list.
+     * @param req the request
+     * @param res the response
+     */
+    public async postTodo(req: IncomingMessage, res: ServerResponse) {
+        this.wrapExceptions(req, res, () => {
+            let body = ''
+
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+
+            req.on('end', () => {
+                const todoItem = JSON.parse(body);
+                todoItem.id = generateID();
+                data.push(todoItem);
+
+                res.writeHead(200, this.headers);
+                res.end(JSON.stringify(todoItem));
+            });
+        })
+    }
+
+    /**
+     * It updates a TodoItem.
+     * @param req the request
+     * @param res the response
+     */
+    public async patchTodo(req: IncomingMessage, res: ServerResponse) {
+        this.wrapExceptions(req, res, () => {
+            let body = ''
+
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+
+            req.on('end', () => {
+                const todoItem = JSON.parse(body);
+                data.forEach(dataItem => {
+                    if (dataItem.id === todoItem.id) {
+                        dataItem.description = todoItem.description;
+                    }
+                });
+
+                res.writeHead(200, this.headers);
+                res.end();
+            });
+        })
+    }
+
+    /**
+     * It deletes a TodoItem.
+     * @param req the request
+     * @param res the response
+     */
+    public async deleteTodo(req: IncomingMessage, res: ServerResponse) {
+        this.wrapExceptions(req, res, () => {
+            const todoItemId = req.url?.substring(req.url?.lastIndexOf("/") + 1)
+            if (todoItemId) {
+                data.forEach((dataItem, index) => {
+                    if (dataItem.id === todoItemId) {
+                        data.splice(index, 1)
+                    }
+                });
+                res.writeHead(200, this.headers);
+            } else {
+                res.writeHead(500, this.headers);
+            }
+
+            res.end();
+        })
+    }
+
+    /**
+     * It wraps the exceptions of a function that will be invoked.
+     * @param req the request
+     * @param res the response
+     * @param func the function to be invoked
+     * @private
+     */
+    private wrapExceptions(req: IncomingMessage, res: ServerResponse, func: () => void) {
+        try {
+            func();
+        } catch (error) {
+            res.writeHead(500, this.headers);
+            res.end();
+        }
     }
 }
 
