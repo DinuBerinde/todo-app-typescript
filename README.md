@@ -3,14 +3,14 @@ A todo app written in typescript (front-end and back-end)
 
 ### Tools used front-end
 * Node
-* Typescript as programming language
+* Typescript 
 * Webpack as a module bundler and dev server 
 * Axios for http requests  
 * Bootstrap v4 CDN for css styles 
 
 ### Tools used backend-end
 * Node
-* Typescript as programming language
+* Typescript 
 * Nodemon as dev server and live reload
 
 ## Usage front-end
@@ -32,7 +32,7 @@ The app will be available in browser at `localhost:8000`
 
 ## Usage back-end
 from root folder run the following cmd  
-`cd app-backend-end`
+`cd app-back-end`
 
 ### Install dependencies
 `npm run i`
