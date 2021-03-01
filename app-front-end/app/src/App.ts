@@ -2,40 +2,31 @@ import {AbstractComponent} from "./modules/AbstractComponent";
 import {AddTodoComponent} from "./modules/todo/AddTodoComponent";
 import {HtmlUtils} from "./utils/HtmlUtils";
 import {ListTodoComponent} from "./modules/todo/ListTodoComponent";
+import {TodoService} from "./services/TodoService";
 
 // app div element
 const appEl = document.getElementById("app") as HTMLElement;
 appEl.classList.add("container")
 
+/**
+ * The items data
+ */
+const data: Array<Todo> = []
 
 /**
- * It generates an id.
- * @return the generated id
+ * the crud service
  */
-const generateID = () => {
-    const min = Math.ceil(0);
-    const max = Math.floor(9999);
-    return "" + Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-/**
- * The todoItems data
- */
-const data: Array<Todo> = [
-    {
-        "id": generateID(),
-        "description": "Fix bug Jira-12313"
-    },
-    {
-        "id": generateID(),
-        "description": "Meeting scheduled for tomorrow at 12:00"
-    }
-]
+const todoService = new TodoService();
 
 class App extends AbstractComponent {
     private listTodoComponent: ListTodoComponent;
 
-    public render(): AbstractComponent {
+    public async onPreRender(): Promise<void> {
+        const items = await todoService.get();
+        data.push(...items)
+    }
+
+    public render() {
 
         const divTitle = HtmlUtils.buildElement({
             name: 'div',
@@ -64,8 +55,6 @@ class App extends AbstractComponent {
         this.rootEl.appendChild(divTitle)
         this.rootEl.appendChild(addTodoComponent.getEl());
         this.rootEl.appendChild(this.listTodoComponent.getEl());
-
-        return this;
     }
 
     public buildRootElement(id?: string): HTMLElement {
@@ -84,11 +73,13 @@ class App extends AbstractComponent {
      * @param itemTodo the description of the TodoItem
      */
     public onAddTodoItem(itemTodo: string) {
-        data.push({
-            id: generateID(),
+        todoService.post({
+            id: '',
             description: itemTodo
-        });
-        this.listTodoComponent.addTodoItem(data[data.length - 1]);
+        }).then(res => {
+            data.push(res)
+            this.listTodoComponent.addTodoItem(data[data.length - 1]);
+        })
     }
 
     /**
@@ -99,7 +90,9 @@ class App extends AbstractComponent {
      */
     public onUpdateTodoItem(todoItem: Todo, id: string, newDescription: string) {
         todoItem.description = newDescription;
-        this.listTodoComponent.updateTodoItem(todoItem, id);
+        todoService.patch(todoItem).then(res => {
+            this.listTodoComponent.updateTodoItem(todoItem, id);
+        })
     }
 
     /**
@@ -107,12 +100,14 @@ class App extends AbstractComponent {
      * @param id the id of the item
      */
     public onRemoveTodoItem(id: string) {
-        data.forEach((dataItem, index) => {
-            if (dataItem.id === id) {
-                data.splice(index, 1);
-            }
+        todoService.delete(id).then(res => {
+            data.forEach((dataItem, index) => {
+                if (dataItem.id === id) {
+                    data.splice(index, 1);
+                }
+            })
+            this.listTodoComponent.removeTodoItem(id);
         })
-        this.listTodoComponent.removeTodoItem(id);
     }
 }
 

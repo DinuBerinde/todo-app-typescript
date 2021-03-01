@@ -6,7 +6,7 @@ import {HtmlUtils} from "../../utils/HtmlUtils";
  */
 export class TodoComponent extends AbstractComponent {
 
-    public render(): AbstractComponent {
+    public render() {
 
         const divDescription = HtmlUtils.buildElement({
             name: 'div',
@@ -103,8 +103,6 @@ export class TodoComponent extends AbstractComponent {
         this.rootEl.appendChild(divEdit)
         this.rootEl.appendChild(buttonRemove)
         this.rootEl.appendChild(buttonEdit)
-
-        return this;
     }
 
     public buildRootElement(id?: string): HTMLElement {

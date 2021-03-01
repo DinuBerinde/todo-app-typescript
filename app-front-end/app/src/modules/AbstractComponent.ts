@@ -12,18 +12,27 @@ export abstract class AbstractComponent {
         this.properties = properties;
         this.rootEl = this.buildRootElement(properties.id)
         properties.parentEl.appendChild(this.rootEl);
-        this.render()
+
+        (async () => {
+            await this.onPreRender();
+            this.render();
+        })();
     }
 
     /**
      * Render method to be implemented.
      */
-    public abstract render(): AbstractComponent;
+    public abstract render(): void;
 
     /**
      * It builds and returns the root element of this component.
      */
     public abstract buildRootElement(id?: string): HTMLElement;
+
+    /**
+     * Method used before rendering. Useful for fetching data.
+     */
+    public async onPreRender(): Promise<void> {};
 
     /**
      * Yields the HTML element of this component.

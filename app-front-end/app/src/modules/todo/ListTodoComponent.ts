@@ -8,12 +8,10 @@ import {Todo} from "../../App";
  */
 export class ListTodoComponent extends AbstractComponent {
 
-    public render(): AbstractComponent {
+    public render() {
         if (this.properties.data) {
             this.properties.data.forEach(data => this.rootEl.appendChild(this.buildTodoComponent(data).getEl()))
         }
-
-        return this;
     }
 
     public buildRootElement(id?: string): HTMLElement {

@@ -6,7 +6,8 @@ import {HtmlUtils} from "../../utils/HtmlUtils";
  */
 export class AddTodoComponent extends AbstractComponent {
 
-    public render(): AbstractComponent {
+
+    public render() {
         const form = HtmlUtils.buildElement({name: 'form'});
         const div = HtmlUtils.buildElement({name: 'div', classes: "form-group"});
         const label = HtmlUtils.buildElement({name: 'label', text: 'Add a TODO item'});
@@ -30,8 +31,6 @@ export class AddTodoComponent extends AbstractComponent {
         form.appendChild(div)
         form.appendChild(addButton)
         this.rootEl.appendChild(form);
-
-        return this;
     }
 
     public buildRootElement(id?: string): HTMLElement {
