@@ -26,12 +26,13 @@ export class ListTodoComponent extends AbstractComponent {
     }
 
     private buildTodoComponent(data: Todo): TodoComponent {
+        console.log(data)
         return new TodoComponent({
             parentEl: this.rootEl,
             id: data.id,
             data: data,
             onRemoveTodoItem: id => this.properties.onRemoveTodoItem(id),
-            onUpdateTodoItem: (todo, id, newDescription) => this.properties.onUpdateTodoItem(todo, id, newDescription),
+            onUpdateTodoItem: (todo, id) => this.properties.onUpdateTodoItem(todo, id),
         })
     }
 

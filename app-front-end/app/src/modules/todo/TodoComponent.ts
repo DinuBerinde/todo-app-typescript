@@ -106,7 +106,7 @@ export class TodoComponent extends AbstractComponent {
         buttonConfirm.onclick = ev => {
 
             const todoItem: Todo = {
-                id: '',
+                id: this.properties.id,
                 title: containerInputTitle.component.value,
                 description: containerInputDescription.component.value,
                 state: containerState.component.value,
@@ -140,6 +140,13 @@ export class TodoComponent extends AbstractComponent {
             }
         });
         buttonCancelEdit.onclick = ev => {
+
+            // restore data
+            containerInputTitle.component.value = this.properties.data.title;
+            containerInputDescription.component.value = this.properties.data.description;
+            containerState.component.value = this.properties.data.state;
+            containerExpirationDate.component.value = this.properties.data.expirationDate;
+
             // hide/show views
             divContainerEdit.style.display = 'none'
             buttonRemove.style.display = ''
