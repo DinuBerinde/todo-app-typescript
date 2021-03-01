@@ -57,11 +57,10 @@ export class HtmlUtils {
         return el
     }
 
-    public static buildInputComponent(labelTxt: string, inputId: string, inputValue: string, style?: any): HtmlComponent {
+    private static buildInternalInputComponent(type: string, labelTxt: string, inputId: string, inputValue: string, maxLength?: number): HtmlComponent {
         const divContainer = HtmlUtils.buildElement({
             name: 'div',
-            classes: 'form-group col-12',
-            style: style
+            classes: 'form-group col-12'
         })
 
         const label = HtmlUtils.buildElement({
@@ -73,12 +72,15 @@ export class HtmlUtils {
         });
 
         const input = HtmlUtils.buildElementInput({
-            name: 'input',
+            name: type,
             id: 'edit' + inputId,
             classes: 'form-control',
-            type: 'text',
+            type: type === 'textarea' ? undefined : 'text',
             text: inputValue
         }) as HTMLInputElement
+        if (maxLength) {
+            input.maxLength = maxLength
+        }
 
         divContainer.appendChild(label)
         divContainer.appendChild(input)
@@ -87,6 +89,14 @@ export class HtmlUtils {
             component: input,
             container: divContainer
         }
+    }
+
+    public static buildTextareaComponent(labelTxt: string, inputId: string, inputValue: string, maxLength?: number): HtmlComponent {
+        return HtmlUtils.buildInternalInputComponent('textarea', labelTxt, inputId, inputValue, maxLength);
+    }
+
+    public static buildInputComponent(labelTxt: string, inputId: string, inputValue: string, maxLength?: number): HtmlComponent {
+        return HtmlUtils.buildInternalInputComponent('input', labelTxt, inputId, inputValue, maxLength);
     }
 
     public static buildDatepickerComponent(labelTxt: string, inputId: string, inputValue: string, style?: any): HtmlComponent {

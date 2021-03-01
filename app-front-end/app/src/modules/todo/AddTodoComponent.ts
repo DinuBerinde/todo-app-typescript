@@ -14,13 +14,15 @@ export class AddTodoComponent extends AbstractComponent {
         const containerInputTitle = HtmlUtils.buildInputComponent(
             'Title',
             'addTitle',
-            ''
+            '',
+            100
         );
 
-        const containerInputDescription = HtmlUtils.buildInputComponent(
+        const containerInputDescription = HtmlUtils.buildTextareaComponent(
             'Description',
             'addDescription',
-            ''
+            '',
+            500
         );
 
         const containerState = HtmlUtils.buildSelectComponent(

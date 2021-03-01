@@ -66,13 +66,16 @@ export class TodoComponent extends AbstractComponent {
         const containerInputTitle = HtmlUtils.buildInputComponent(
             'Title',
             'title' + this.properties.data.id,
-            this.properties.data.title
+            this.properties.data.title,
+            100
         );
+        containerInputTitle.component.maxlength = '100'
 
-        const containerInputDescription = HtmlUtils.buildInputComponent(
+        const containerInputDescription = HtmlUtils.buildTextareaComponent(
             'Description',
             'description' + this.properties.data.id,
-            this.properties.data.description
+            this.properties.data.description,
+            500
         );
 
         const containerState = HtmlUtils.buildSelectComponent(
