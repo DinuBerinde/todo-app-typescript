@@ -1,8 +1,11 @@
 import {Request, Response} from "express";
 
+/**
+ * It generates a unique ID.
+ */
 const generateID = () => {
     const min = Math.ceil(0);
-    const max = Math.floor(9999);
+    const max = Math.floor(9999999);
     return "" + Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -11,12 +14,18 @@ const generateID = () => {
  */
 const data: Array<TodoItem> = [
     {
-        "id": generateID(),
-        "description": "Fix bug Jira-12313"
+        id: generateID(),
+        title: "Fix bug ",
+        description: "fix bug Jira-12313 ...",
+        state: 'Inserito',
+        expirationDate: '2021-03-01'
     },
     {
-        "id": generateID(),
-        "description": "Meeting scheduled for tomorrow at 12:00"
+        id: generateID(),
+        title: "Meeting tomorrow ",
+        description: "Meeting scheduled for tomorrow at 12:00",
+        state: 'Inserito',
+        expirationDate: '2021-03-02'
     }
 ]
 
@@ -62,5 +71,8 @@ export class TodoController {
 
 interface TodoItem {
     id: string;
+    title: string;
     description: string;
+    state: string;
+    expirationDate: string;
 }

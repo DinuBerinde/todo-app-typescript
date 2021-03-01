@@ -1,17 +1,16 @@
 import {AbstractComponent} from "../AbstractComponent";
 import {HtmlUtils} from "../../utils/HtmlUtils";
+import {Todo} from "../../App";
 
 /**
  * TodoItem component to perform a CRUD.
  */
 export class TodoComponent extends AbstractComponent {
 
-    public render() {
 
-        const divDescription = HtmlUtils.buildElement({
-            name: 'div',
-            text: this.properties.data.description
-        })
+    public render() {
+        // container description
+        const divContainerDescription = this.buildContainerDescription();
 
         // to remove a TodoItem
         const buttonRemove = HtmlUtils.buildElementButton({
@@ -20,40 +19,74 @@ export class TodoComponent extends AbstractComponent {
             type: 'button',
             text: 'Remove',
             style: {
-                float: 'right'
+                float: 'right',
+                marginTop: '16px'
             }
         });
         buttonRemove.onclick = ev => this.properties.onRemoveTodoItem(this.properties.id)
 
-        // to show the UI in order to update a TodoItem
+        // to update a TodoItem
         const buttonEdit = HtmlUtils.buildElementButton({
             name: 'button',
-            classes: 'btn btn-info',
+            classes: 'btn btn-primary',
             type: 'button',
             text: 'Edit',
             style: {
                 float: 'right',
-                marginRight: '20px'
+                marginRight: '20px',
+                marginTop: '16px'
             }
         });
         buttonEdit.onclick = ev => {
             buttonRemove.style.display = 'none'
             buttonEdit.style.display = 'none'
-            divDescription.style.display = 'none'
-            divEdit.style.display = ''
+            divContainerDescription.style.display = 'none'
+            divContainerEdit.style.display = ''
         }
 
+        // edit container
+        const divContainerEdit = this.buildContainerEdit(buttonRemove, buttonEdit, divContainerDescription);
 
-        // edit div
-        const divEdit = HtmlUtils.buildElement({name: 'div', style: {display: 'none'}})
+        this.rootEl.appendChild(divContainerDescription)
+        this.rootEl.appendChild(divContainerEdit)
+        this.rootEl.appendChild(buttonRemove)
+        this.rootEl.appendChild(buttonEdit)
+    }
 
-        const input = HtmlUtils.buildElementInput({
-            name: 'input',
-            id: 'editTodoInput' + this.properties.data.id,
-            classes: 'form-control',
-            type: 'text',
-            text: this.properties.data.description
-        }) as HTMLInputElement
+
+    private buildContainerEdit(buttonRemove: HTMLElement, buttonEdit: HTMLElement, divContainerDescription: HTMLElement): HTMLElement {
+        const divContainerEdit = HtmlUtils.buildElement({
+            name: 'div',
+            classes: 'row',
+            style: {
+                display: 'none'
+            }
+        })
+
+        const containerInputTitle = HtmlUtils.buildInputComponent(
+            'Title',
+            'title' + this.properties.data.id,
+            this.properties.data.title
+        );
+
+        const containerInputDescription = HtmlUtils.buildInputComponent(
+            'Description',
+            'description' + this.properties.data.id,
+            this.properties.data.description
+        );
+
+        const containerState = HtmlUtils.buildSelectComponent(
+            'State',
+            'state' + this.properties.data.id,
+            ["Inserito", "In elaborazione", 'Completato'],
+            this.properties.data.state
+        );
+
+        const containerExpirationDate = HtmlUtils.buildDatepickerComponent(
+            'Expiration Date',
+            'expiration' + this.properties.data.id,
+            this.properties.data.expirationDate
+        );
 
         // to confirm the update of a TodoItem
         const buttonConfirm = HtmlUtils.buildElementButton({
@@ -68,17 +101,27 @@ export class TodoComponent extends AbstractComponent {
             }
         });
         buttonConfirm.onclick = ev => {
-            if (!input.value) {
-                alert("No empty TODO item allowed");
+
+            const todoItem: Todo = {
+                id: '',
+                title: containerInputTitle.component.value,
+                description: containerInputDescription.component.value,
+                state: containerState.component.value,
+                expirationDate: containerExpirationDate.component.value
+            }
+
+            const errors = TodoComponent.validateTodoItem(todoItem);
+            if(errors) {
+                alert(errors);
                 return;
             }
-            
-            const newDescription = input.value
-            this.properties.onUpdateTodoItem(this.properties.data, this.properties.id, newDescription)
 
-            divEdit.style.display = 'none'
+            this.properties.onUpdateTodoItem(todoItem, this.properties.id)
+
+            // hide/show views
+            divContainerEdit.style.display = 'none'
             buttonRemove.style.display = ''
-            divDescription.style.display = ''
+            divContainerDescription.style.display = ''
             buttonEdit.style.display = ''
         }
 
@@ -94,20 +137,114 @@ export class TodoComponent extends AbstractComponent {
             }
         });
         buttonCancelEdit.onclick = ev => {
-            divEdit.style.display = 'none'
+            // hide/show views
+            divContainerEdit.style.display = 'none'
             buttonRemove.style.display = ''
-            divDescription.style.display = ''
+            divContainerDescription.style.display = ''
             buttonEdit.style.display = ''
         }
 
-        divEdit.appendChild(input)
-        divEdit.appendChild(buttonCancelEdit)
-        divEdit.appendChild(buttonConfirm)
 
-        this.rootEl.appendChild(divDescription)
-        this.rootEl.appendChild(divEdit)
-        this.rootEl.appendChild(buttonRemove)
-        this.rootEl.appendChild(buttonEdit)
+        const divBtns = HtmlUtils.buildElement({
+            name: 'div',
+            classes: 'col-12',
+        })
+        divBtns.appendChild(buttonCancelEdit)
+        divBtns.appendChild(buttonConfirm)
+
+        divContainerEdit.appendChild(containerInputTitle.container)
+        divContainerEdit.appendChild(containerInputDescription.container)
+        divContainerEdit.appendChild(containerState.container)
+        divContainerEdit.appendChild(containerExpirationDate.container)
+        divContainerEdit.appendChild(divBtns)
+
+        return divContainerEdit;
+    }
+
+    private buildContainerDescription(): HTMLElement {
+        const divContainerDescription = HtmlUtils.buildElement({
+            name: 'div',
+            classes: 'row'
+        })
+
+        const divTitle = HtmlUtils.buildElement({
+            name: 'div',
+            text: this.properties.data.title,
+            classes: 'col-8',
+            style: {
+                fontSize: '18px',
+                fontWeight: 'bold'
+            }
+        })
+
+        const spanDescription = HtmlUtils.buildElement({
+            name: 'span',
+            text: this.properties.data.state,
+            classes: 'badge badge-secondary',
+            style: {
+                padding: '6px'
+            }
+        })
+
+        const spanExpiration = HtmlUtils.buildElement({
+            name: 'span',
+            text: this.properties.data.expirationDate,
+            classes: 'badge badge-info',
+            style: {
+                padding: '6px',
+                marginRight: '16px'
+            }
+        })
+
+        const divState = HtmlUtils.buildElement({
+            name: 'div',
+            classes: 'col-4',
+            style: {
+                textAlign: 'right'
+            }
+        })
+
+        divState.appendChild(spanExpiration)
+        divState.appendChild(spanDescription)
+
+        const divDescription = HtmlUtils.buildElement({
+            name: 'div',
+            text: this.properties.data.description,
+            classes: 'col-12'
+        })
+
+
+        divContainerDescription.appendChild(divTitle);
+        divContainerDescription.appendChild(divState);
+        divContainerDescription.appendChild(divDescription);
+
+        return divContainerDescription;
+    }
+
+    public static validateTodoItem(todoItem: Todo) {
+        let errors = '';
+
+        if (!todoItem.title) {
+            errors += "Titolo obbligatorio\n"
+        }
+
+        if (!todoItem.description) {
+            errors += "Descrizione obbligatoria\n"
+        }
+
+        if (!todoItem.state) {
+            errors += "Stato obbligatorio\n"
+        }
+
+        if (!todoItem.expirationDate) {
+            errors += "Data obbligatoria\n"
+        }
+
+        if (errors) {
+            return errors
+        }
+
+        return null
     }
 
     public buildRootElement(id?: string): HTMLElement {

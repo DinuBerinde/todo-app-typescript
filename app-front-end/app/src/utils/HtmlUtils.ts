@@ -56,6 +56,108 @@ export class HtmlUtils {
 
         return el
     }
+
+    public static buildInputComponent(labelTxt: string, inputId: string, inputValue: string, style?: any): HtmlComponent {
+        const divContainer = HtmlUtils.buildElement({
+            name: 'div',
+            classes: 'form-group col-12',
+            style: style
+        })
+
+        const label = HtmlUtils.buildElement({
+            name: 'label',
+            text: labelTxt,
+            style: {
+                fontWeight: 'bold'
+            }
+        });
+
+        const input = HtmlUtils.buildElementInput({
+            name: 'input',
+            id: 'edit' + inputId,
+            classes: 'form-control',
+            type: 'text',
+            text: inputValue
+        }) as HTMLInputElement
+
+        divContainer.appendChild(label)
+        divContainer.appendChild(input)
+
+        return {
+            component: input,
+            container: divContainer
+        }
+    }
+
+    public static buildDatepickerComponent(labelTxt: string, inputId: string, inputValue: string, style?: any): HtmlComponent {
+        const divContainer = HtmlUtils.buildElement({
+            name: 'div',
+            classes: 'form-group col-4',
+            style: style
+        })
+
+        const label = HtmlUtils.buildElement({
+            name: 'label',
+            text: labelTxt,
+            style: {
+                fontWeight: 'bold'
+            }
+        });
+
+        const input = HtmlUtils.buildElementInput({
+            name: 'input',
+            id: 'edit' + inputId,
+            classes: 'form-control',
+            type: 'date',
+            text: inputValue
+        }) as HTMLInputElement
+
+        divContainer.appendChild(label)
+        divContainer.appendChild(input)
+
+        return {
+            component: input,
+            container: divContainer
+        }
+    }
+
+    public static buildSelectComponent(labelTxt: string, selectId: string, selectValues: Array<string>, selectedValue?: string): HtmlComponent {
+        const divContainer = HtmlUtils.buildElement({
+            name: 'div',
+            classes: 'form-group col-12'
+        })
+
+        const label = HtmlUtils.buildElement({
+            name: 'label',
+            text: labelTxt,
+            style: {
+                fontWeight: 'bold'
+            }
+        });
+
+        const select = document.createElement('select') as HTMLSelectElement
+        select.id = 'select' + selectId
+        select.classList.add("form-control")
+
+        selectValues.forEach(selectValue => {
+            const option = document.createElement('option') as HTMLOptionElement
+            option.value = selectValue
+            option.textContent = selectValue
+            select.appendChild(option);
+        })
+
+        if (selectedValue) {
+            select.value = selectedValue
+        }
+
+        divContainer.appendChild(label)
+        divContainer.appendChild(select)
+
+        return {
+            component: select,
+            container: divContainer
+        }
+    }
 }
 
 export interface HtmlOptions {
@@ -66,4 +168,9 @@ export interface HtmlOptions {
     type?: string;
     placeholder?: string;
     style?: {}
+}
+
+export interface HtmlComponent {
+    component: any,
+    container: HTMLElement
 }

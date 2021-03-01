@@ -25,7 +25,7 @@ class App extends AbstractComponent {
      */
     private readonly data: Array<Todo> = [];
 
-    
+
     public render() {
 
         const divTitle = HtmlUtils.buildElement({
@@ -49,7 +49,7 @@ class App extends AbstractComponent {
             id: 'listTodo',
             data: this.data,
             onRemoveTodoItem: id => this.onRemoveTodoItem(id),
-            onUpdateTodoItem: (todo, id, newDescription) => this.onUpdateTodoItem(todo, id, newDescription),
+            onUpdateTodoItem: (todo, id) => this.onUpdateTodoItem(todo, id),
         });
 
         this.rootEl.appendChild(divTitle)
@@ -64,7 +64,8 @@ class App extends AbstractComponent {
             name: 'div',
             id: id,
             style: {
-                marginTop: '20px'
+                marginTop: '20px',
+                paddingBottom: '40px'
             }
         })
     }
@@ -84,16 +85,13 @@ class App extends AbstractComponent {
     }
 
     /**
-     * It add a new TodoItem.
-     * @param itemTodo the description of the TodoItem
+     * It adds a new TodoItem.
+     * @param todoItem the TodoItem
      */
-    public onAddTodoItem(itemTodo: string) {
+    public onAddTodoItem(todoItem: Todo) {
         (async () => {
 
-            const newTodoItem = await this.todoService.post({
-                id: '',
-                description: itemTodo
-            });
+            const newTodoItem = await this.todoService.post(todoItem);
 
             this.data.push(newTodoItem);
             this.listTodoComponent.addTodoItem(this.data[this.data.length - 1]);
@@ -104,11 +102,8 @@ class App extends AbstractComponent {
      * It updates a TodoItem.
      * @param todoItem the TodoItem that gets updated
      * @param id: the id of the item
-     * @param newDescription the new description of the TodoItem
      */
-    public onUpdateTodoItem(todoItem: Todo, id: string, newDescription: string) {
-        todoItem.description = newDescription;
-
+    public onUpdateTodoItem(todoItem: Todo, id: string) {
         (async () => {
             await this.todoService.patch(todoItem);
             this.listTodoComponent.updateTodoItem(todoItem, id);
@@ -133,7 +128,10 @@ class App extends AbstractComponent {
  */
 export interface Todo {
     id: string;
+    title: string;
     description: string;
+    state: string;
+    expirationDate: string;
 }
 
 // render app
